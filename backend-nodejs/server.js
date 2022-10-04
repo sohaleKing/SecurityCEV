@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const http = require("http"); // for serving HTTP requests
 const fs = require("fs").promises; // for reading files
-const querystring = require('querystring'); // for parsing form fields from POST
+const querystring = require("querystring"); // for parsing form fields from POST
 
 const PORT = {
   BACKEND: 8080,
@@ -57,47 +57,54 @@ app.get("/add-new-user", (req, res) => {
     });
 });
 
-app.get("/insert-data", (req, res) => {
+app.post("/insert-data", (req, res) => {
   let body = "";
   req.on("data", (chunk) => {
     body += chunk.toString();
     req.on("end", () => {
       const fields = querystring.parse(body);
-      let firstName = fields.first_name;
-      let lastName = fields.last_name;
-      let ramqNumber = fields.ramq_number;
+      let first_name = fields.first_name;
+      let last_name = fields.last_name;
+      let ramq_number = fields.ramq_number;
+      let email = fields.email;
       let age = fields.age;
       let gender = fields.gender;
       let telephone = fields.telephone;
       let address = fields.address;
       let status = fields.status;
-      let isVip = fields.is_vip;
+      let is_vip = fields.is_vip;
 
       connection.connect(function (err) {
         if (err) {
           return console.error("error: " + err.message);
         }
         try {
+          const str = `'${first_name}',
+            '${last_name}',
+            '${ramq_number}',
+            '${email}',
+            '${age}',
+            '${gender}',
+            '${telephone}',
+            '${address}',
+            '${status}',
+            '${is_vip}', '0'`;
+          // const str='test'
+          console.log("str=", str);
           connection.query(
-            `INSERT INTO customer(firstName, lastName,ramqNumber,age,gender,telephone,address,status,isVip) VALUES(${firstName},
-                ${lastName},
-                ${ramqNumber},
-                ${age},
-                ${gender},
-                ${telephone},
-                ${address},
-                ${status},
-                ${isVip})`,
+            "INSERT INTO customer(first_name,last_name,ramq_number,email,age,gender,telephone,address,status,is_vip,is_deleted) VALUES(" +
+              str +
+              ")",
             function (err, result) {
               if (err) {
                 return console.error("error: " + err.message);
               }
-
-              res.end();
             }
-          );
+            );
         } finally {
-          connection.end();
+            connection.end();
+            res.redirect(301, 'http://localhost:8080/customer-list');
+            res.end();
         }
       });
     });
