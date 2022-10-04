@@ -89,8 +89,6 @@ app.post("/insert-data", (req, res) => {
             '${address}',
             '${status}',
             '${is_vip}', '0'`;
-          // const str='test'
-          console.log("str=", str);
           connection.query(
             "INSERT INTO customer(first_name,last_name,ramq_number,email,age,gender,telephone,address,status,is_vip,is_deleted) VALUES(" +
               str +
@@ -102,9 +100,8 @@ app.post("/insert-data", (req, res) => {
             }
             );
         } finally {
-            connection.end();
             res.redirect(301, 'http://localhost:8080/customer-list');
-            res.end();
+            // no need to end the db connection
         }
       });
     });
